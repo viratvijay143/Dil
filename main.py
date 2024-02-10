@@ -22,14 +22,14 @@ import re
 import os
 
 bot = Client("bot",
-             bot_token= "6778587387:AAFt5GDWxQjXXM6JX6MB1TTNKYPDivrvK4k",
+             bot_token= "5918506320:AAEWZ-emJg7VnHccf_251OVowJffXirGW0A",
              api_id= 20088962,
              api_hash= "257f47d347157555890a64b12bc0134f")
 
 
 @bot.on_message(filters.command(["start"]))
 async def account_login(bot: Client, m: Message):
-    editable = await m.reply_text(f"Hello [{m.from_user.first_name}](tg://user?id={m.from_user.id})\nPress /covid")
+    editable = await m.reply_text(f"Hello\nPress /txt")
 
 
 @bot.on_message(filters.command("stop"))
@@ -39,7 +39,7 @@ async def restart_handler(_, m):
 
 
 
-@bot.on_message(filters.command(["covid"]))
+@bot.on_message(filters.command(["txt"]))
 async def account_login(bot: Client, m: Message):
     editable = await m.reply_text('Send TXT file for download')
     input: Message = await bot.listen(editable.chat.id)
