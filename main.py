@@ -1,52 +1,49 @@
-from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
-import requests
+import os
+import re
+import sys
 import json
-import subprocess
-from pyrogram import Client, filters
-from pyrogram.types.messages_and_media import message
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram.errors import FloodWait
-from pyromod import listen
-from pyrogram.types import Message
-from pyrogram import Client, filters
-from p_bar import progress_bar
-from subprocess import getstatusoutput
-from aiohttp import ClientSession
-import helper
-from logger import logging
 import time
 import asyncio
-from pyrogram.types import User, Message
-import sys
-import re
-import os
+import requests
+import subprocess
+import core as helper
+from utils import progress_bar
+from vars import api_id, api_hash, bot_token, auth_users, sudo_user, log_channel, txt_channel
+from aiohttp import ClientSession
+from pyromod import listen
+from subprocess import getstatusoutput
+from pyrogram import Client, filters
+from pyrogram.types import Message
+from pyrogram.errors import FloodWait
+from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
+from pyrogram.types.messages_and_media import message
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 bot = Client("bot",
              bot_token= "6827672847:AAEaVb_pWe4uZBZZSSYnK00Wp-_IT35ulr4",
              api_id= 20088962,
              api_hash= "257f47d347157555890a64b12bc0134f")
 
-
 @bot.on_message(filters.command(["start"]))
 async def account_login(bot: Client, m: Message):
-    editable = await m.reply_text(f"Hello\nPress /txt")
+    editable = await m.reply_text("Hi!\n\nGive /classplus Command and send me Text file to Downlaod.\n")
 
-
-@bot.on_message(filters.command("stop"))
+@bot.on_message(filters.command("restart"))
 async def restart_handler(_, m):
-    await m.reply_text("**STOPPED**🚦", True)
+    await m.reply_text("**I'm Restarted**🚦", True)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
-
-
+@bot.on_message(filters.command("terms"))
+async def terms_han(bot: Client, m: Message):
+	
+	await m.reply_text("Dear user,\n\nWelcome to our video downloader bot on Telegram. Before you start using our bot, please read these terms and conditions carefully.\n\nBy using our bot, you agree to the following terms and conditions:\n\n1. Our bot is intended for personal, non-commercial use only. You are responsible for any content that you download through our bot and you should ensure that you have the necessary permissions and rights to use and share the content.\n\n2. Downloading copyrighted content through our bot is strictly prohibited. If we receive any complaints of copyright infringement, we reserve the right to take down the infringing content and terminate the user's access to our bot.\n\n3. We do not store any of your personal data or download history. Your privacy and security are important to us, and we have taken all necessary measures to ensure that your information is safe and protected.\n\n4. We reserve the right to suspend or terminate the bot's services at any time and for any reason.\n\n5. By using our bot, you agree to indemnify and hold us harmless from any claims, damages,\nor losses arising from your use of our bot.\n\nIf you have any questions or concerns about our terms and conditions, please contact us.\n\nThank you for using our video downloader bot on Telegram.\n\nBest regards,\nRishav")
+    
 @bot.on_message(filters.command(["txt"]))
 async def account_login(bot: Client, m: Message):
-    editable = await m.reply_text('Send TXT file for download')
+    editable = await m.reply_text('Hi\n\nI am Ready to download send me a text file» ')
     input: Message = await bot.listen(editable.chat.id)
     x = await input.download()
     await input.delete(True)
-
-
 
     path = f"./downloads/{m.chat.id}"
 
@@ -65,7 +62,7 @@ async def account_login(bot: Client, m: Message):
            return
     
    
-    await editable.edit(f"Total links found are **{len(links)}**\n\nSend From where you want to download initial is **1**")
+    await editable.edit(f"Total links founds in Text File are **{len(links)}**\n\nSend From where you want to download initial is **1**")
     input0: Message = await bot.listen(editable.chat.id)
     raw_text = input0.text
     await input0.delete(True)
@@ -100,17 +97,17 @@ async def account_login(bot: Client, m: Message):
     
     
 
-    await editable.edit("**Enter A Highlighter Otherwise send 👉Co👈 **")
+    await editable.edit("Enter A Caption or Downloded by to add Otherwise send **no**")
     input3: Message = await bot.listen(editable.chat.id)
     raw_text3 = input3.text
     await input3.delete(True)
     highlighter  = f"️ ⁪⁬⁮⁮⁮"
-    if raw_text3 == 'Co':
+    if raw_text3 == 'no':
         MR = highlighter 
     else:
         MR = raw_text3
    
-    await editable.edit("Now send the **Thumb url**\nEg : ```https://telegra.ph/file/0633f8b6a6f110d34f044.jpg```\n\nor Send `no`")
+    await editable.edit("Now send the **Thumb url**\nEg » ```https://telegra.ph/file/0633f8b6a6f110d34f044.jpg```\n\nor Send `no`")
     input6 = message = await bot.listen(editable.chat.id)
     raw_text6 = input6.text
     await input6.delete(True)
@@ -140,8 +137,17 @@ async def account_login(bot: Client, m: Message):
                         text = await resp.text()
                         url = re.search(r"(https://.*?playlist.m3u8.*?)\"", text).group(1)
 
+            if "tencdn.classplusapp" in url:
+            	headers = {'Host': 'api.classplusapp.com', 'x-access-token': 'eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpZCI6MzgzNjkyMTIsIm9yZ0lkIjoyNjA1LCJ0eXBlIjoxLCJtb2JpbGUiOiI5MTcwODI3NzQyODkiLCJuYW1lIjoiQWNlIiwiZW1haWwiOm51bGwsImlzRmlyc3RMb2dpbiI6dHJ1ZSwiZGVmYXVsdExhbmd1YWdlIjpudWxsLCJjb3VudHJ5Q29kZSI6IklOIiwiaXNJbnRlcm5hdGlvbmFsIjowLCJpYXQiOjE2NDMyODE4NzcsImV4cCI6MTY0Mzg4NjY3N30.hM33P2ai6ivdzxPPfm01LAd4JWv-vnrSxGXqvCirCSpUfhhofpeqyeHPxtstXwe0', 'user-agent': 'Mobile-Android', 'app-version': '1.4.37.1', 'api-version': '18', 'device-id': '5d0d17ac8b3c9f51', 'device-details': '2848b866799971ca_2848b8667a33216c_SDK-30', 'accept-encoding': 'gzip'}
+            	params = (('url', f'{url}'),)
+            	response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            	url = response.json()['url']	
+
             elif 'videos.classplusapp' in url:
-             url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': 'eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpZCI6MzgzNjkyMTIsIm9yZ0lkIjoyNjA1LCJ0eXBlIjoxLCJtb2JpbGUiOiI5MTcwODI3NzQyODkiLCJuYW1lIjoiQWNlIiwiZW1haWwiOm51bGwsImlzRmlyc3RMb2dpbiI6dHJ1ZSwiZGVmYXVsdExhbmd1YWdlIjpudWxsLCJjb3VudHJ5Q29kZSI6IklOIiwiaXNJbnRlcm5hdGlvbmFsIjowLCJpYXQiOjE2NDMyODE4NzcsImV4cCI6MTY0Mzg4NjY3N30.hM33P2ai6ivdzxPPfm01LAd4JWv-vnrSxGXqvCirCSpUfhhofpeqyeHPxtstXwe0'}).json()['url']
+              headers = {'Host': 'api.classplusapp.com', 'x-access-token': 'eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpZCI6MzgzNjkyMTIsIm9yZ0lkIjoyNjA1LCJ0eXBlIjoxLCJtb2JpbGUiOiI5MTcwODI3NzQyODkiLCJuYW1lIjoiQWNlIiwiZW1haWwiOm51bGwsImlzRmlyc3RMb2dpbiI6dHJ1ZSwiZGVmYXVsdExhbmd1YWdlIjpudWxsLCJjb3VudHJ5Q29kZSI6IklOIiwiaXNJbnRlcm5hdGlvbmFsIjowLCJpYXQiOjE2NDMyODE4NzcsImV4cCI6MTY0Mzg4NjY3N30.hM33P2ai6ivdzxPPfm01LAd4JWv-vnrSxGXqvCirCSpUfhhofpeqyeHPxtstXwe0', 'user-agent': 'Mobile-Android', 'app-version': '1.4.37.1', 'api-version': '18', 'device-id': '5d0d17ac8b3c9f51', 'device-details': '2848b866799971ca_2848b8667a33216c_SDK-30', 'accept-encoding': 'gzip'}
+            	params = (('url', f'{url}'),)
+            	response = requests.get('https://api.classplusapp.com/cams/uploader/video/jw-signed-url', headers=headers, params=params)
+            	url = response.json()['url']
 
             elif '/master.mpd' in url:
              id =  url.split("/")[-2]
@@ -162,8 +168,8 @@ async def account_login(bot: Client, m: Message):
 
             try:  
                 
-                cc = f'**[🎬] Vid_ID : {str(count).zfill(3)}**\n**Title : ** {name1}\n**Batch Name :** {raw_text0}\n\n**Downloaded by : {MR}**'
-                cc1 = f'**[📕] Pdf_ID : {str(count).zfill(3)}**\n**Title : ** {name1}\n**Batch Name :**{raw_text0}\n\n**Downloaded by : {MR}**'
+                cc = f'** {str(count).zfill(3)}.** {𝗻𝗮𝗺𝗲𝟭}\n**Batch »** {raw_text0}\n\n'
+                cc1 = f'** {str(count).zfill(3)}.** {𝗻𝗮𝗺𝗲𝟭}\n**Batch »** {raw_text0}\n\n'
                 if "drive" in url:
                     try:
                         ka = await helper.download(url, name)
@@ -189,7 +195,7 @@ async def account_login(bot: Client, m: Message):
                         time.sleep(e.x)
                         continue
                 else:
-                    Show = f"**Downloading:-**\n\n**Name :-** `{name}\nQuality - {raw_text2}`\n\n**Url :-** `{url}`"
+                    Show = f"**⥥ Downloading »**\n\n**Name »** `{name}\nQuality » {raw_text2}`\n\n**Piracy is illegal 🚫**\n\nEnter /terms To know our terms and conditions."
                     prog = await m.reply_text(Show)
                     res_file = await helper.download_video(url, cmd, name)
                     filename = res_file
@@ -200,7 +206,7 @@ async def account_login(bot: Client, m: Message):
 
             except Exception as e:
                 await m.reply_text(
-                    f"**downloading failed 🥺**\n{str(e)}\n**Name** - {name}\n**Link** - `{url}`"
+                    f"**downloading Interupted **\n{str(e)}\n**Name** » {name}\n**Link** » `{url}`"
                 )
                 continue
 
