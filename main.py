@@ -22,13 +22,13 @@ import re
 import os
 
 bot = Client("bot",
-             bot_token= "6827672847:AAEaVb_pWe4uZBZZSSYnK00Wp-_IT35ulr4",
-             api_id= 20088962,
-             api_hash= "257f47d347157555890a64b12bc0134f")
+             bot_token= "7131548189:AAFJuA1R05qcG2aLVp35HygVQsdwBIXUFS4",
+             api_id= 28328736,
+             api_hash= "802254a44896baa87f3083b7af36b2e5")
 
 @bot.on_message(filters.command(["start"]))
 async def account_login(bot: Client, m: Message):
-    editable = await m.reply_text("Hi!\n\nGive /classplus Command and send me Text file to Downlaod.\n")
+    editable = await m.reply_text("Hi!\n\nGive /txt Command and send me Text file to Downlaod.\n")
 
 @bot.on_message(filters.command("restart"))
 async def restart_handler(_, m):
@@ -170,8 +170,8 @@ async def account_login(bot: Client, m: Message):
 
             try:  
                 
-                cc = f'** {str(count).zfill(3)}.** {𝗻𝗮𝗺𝗲𝟭}\n**Batch »** {raw_text0}\n\n'
-                cc1 = f'** {str(count).zfill(3)}.** {𝗻𝗮𝗺𝗲𝟭}\n**Batch »** {raw_text0}\n\n'
+                cc = f'**[🎬] Vid_ID : {str(count).zfill(3)}**\n**Title : ** {𝗻𝗮𝗺𝗲𝟭}\n**Batch Name :** {raw_text0}\n\n**Downloaded by : {MR}**'
+                cc1 = f'**[📕] Pdf_ID : {str(count).zfill(3)}**\n**Title : ** {𝗻𝗮𝗺𝗲𝟭}\n**Batch Name :**{raw_text0}\n\n**Downloaded by : {MR}**'
                 if "drive" in url:
                     try:
                         ka = await helper.download(url, name)
